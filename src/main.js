@@ -36,11 +36,13 @@ for (let i = 0; i < STAR_COUNT; i++) {
   starsContainer.appendChild(star);
 }
 
-// snow
+const snowLayer = document.getElementById('snow-layer');
+
 if (!prefersReducedMotion) {
   new Snowflakes({
+    container: snowLayer,
     color: '#ffffff',
-    count: 70,
+    count: 175,
     minOpacity: 0.3,
     maxOpacity: 0.9,
     minSize: 8,
@@ -48,6 +50,42 @@ if (!prefersReducedMotion) {
     speed: 0.8,
     wind: true,
     rotation: true,
-    zIndex: 1,
   });
+}
+
+const MAX_TILT = 30;
+let targetAngle = 0;
+let currentAngle = 0;
+let tiltRunning = false;
+
+function tiltLoop() {
+  currentAngle += (targetAngle - currentAngle) * 0.08;
+  snowLayer.style.transform = `rotate(${-currentAngle}deg)`;
+  requestAnimationFrame(tiltLoop);
+}
+
+function handleTilt(e) {
+  if (e.gamma == null) return;
+  const isPortrait = !screen.orientation || screen.orientation.angle % 180 === 0;
+  const gamma = isPortrait ? e.gamma : 0;
+  targetAngle = Math.max(-MAX_TILT, Math.min(MAX_TILT, gamma));
+  if (!tiltRunning) {
+    tiltRunning = true;
+    requestAnimationFrame(tiltLoop);
+  }
+}
+
+if (!prefersReducedMotion && 'DeviceOrientationEvent' in window) {
+  window.addEventListener('deviceorientation', handleTilt);
+
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.addEventListener(
+      'click',
+      () => {
+        DeviceOrientationEvent.requestPermission().catch(() => {
+        });
+      },
+      { once: true }
+    );
+  }
 }

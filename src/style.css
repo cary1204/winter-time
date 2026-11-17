@@ -120,6 +120,18 @@ body {
   animation: rise 1.6s ease-out 1.2s both;
 }
 
+#snow-layer {
+  position: fixed;
+  top: -12.5%;
+  left: -50%;
+  width: 200%;
+  height: 125%;
+  z-index: 1; /* above mountains (0), below text (2) */
+  overflow: hidden;
+  pointer-events: none;
+  will-change: transform;
+}
+
 @keyframes page-fade {
   from {
     opacity: 0;
