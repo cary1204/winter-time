@@ -2,7 +2,7 @@
 
 **[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://cary1204.github.io/winter-time/)**
 
-Tried to use Vite and npm instead of plain html for this time, cool stuff. Have mountains, sky, moon, and a live clock. Happy Winter
+Tried to use Vite and npm instead of plain html for this time, cool stuff. Have mountains, sky, moon, and a live clock. Happy Winter!
 
 Will try to remake this with React some times later.
 
@@ -11,10 +11,14 @@ Will try to remake this with React some times later.
 <img src="screenshot.png" alt="Winter Night screenshot" width="450">
 
 
+# Features
+
+ - Time
+ - Falling snow
+ - Mobile tilt sense (click the screen and press `allow` for the tilt sensor)
+
 
 # Some stuff used
-
-falling snow: [magic-snowflakes](https://www.npmjs.com/package/magic-snowflakes)
 
 Build tool: [Vite](https://vite.dev)
 
