@@ -1,8 +1,16 @@
 # Winter Night
 
+**[![Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://cary1204.github.io/winter-time/)**
+
 Tried to use Vite and npm instead of plain html for this time, cool stuff. Have mountains, sky, moon, and a live clock. Happy Winter
 
 Will try to remake this with React some times later.
+
+**demo → https://cary1204.github.io/winter-time/**
+
+<img src="screenshot.png" alt="Winter Night screenshot" width="450">
+
+
 
 # Some stuff used
 
