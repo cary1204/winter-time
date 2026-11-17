@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Winter Night</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="stars" aria-hidden="true"></div>
+    <div class="moon" aria-hidden="true"></div>
+
+    <svg
+      class="mountains"
+      viewBox="0 0 1440 400"
+      preserveAspectRatio="xMidYMax slice"
+      aria-hidden="true"
+    >
+      <polygon
+        class="m-back"
+        points="0,400 0,260 120,170 220,250 340,140 470,260 600,190 720,270 860,150 990,255 1100,180 1220,250 1340,160 1440,240 1440,400"
+      />
+      <g class="snow-caps">
+        <polygon points="120,170 95,189 108,184 120,194 132,184 145,190" />
+        <polygon points="340,140 317,161 329,156 340,166 351,156 363,161" />
+        <polygon points="600,190 580,201 590,198 600,206 610,198 620,203" />
+        <polygon points="860,150 835,171 848,166 860,176 872,166 885,170" />
+        <polygon points="1100,180 1080,194 1090,190 1100,198 1110,190 1120,192" />
+        <polygon points="1340,160 1318,177 1329,172 1340,182 1351,172 1362,178" />
+      </g>
+      <polygon
+        class="m-mid"
+        points="0,400 0,310 90,250 190,320 300,230 420,330 540,270 650,335 780,250 900,330 1010,280 1130,340 1250,265 1360,325 1440,290 1440,400"
+      />
+      <polygon
+        class="m-front"
+        points="0,400 0,350 140,310 260,360 400,320 520,365 660,335 800,372 940,330 1080,368 1220,335 1340,365 1440,345 1440,400"
+      />
+    </svg>
+
+    <main class="content">
+      <time id="clock" class="clock">--:--</time>
+      <p class="motto">Happy Winter!</p>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
