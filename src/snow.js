@@ -2,8 +2,8 @@ const canvas = document.getElementById('snow');
 const ctx = canvas.getContext('2d');
 
 const FLAKE_COUNT = 40;
-const MAX_ANGLE = 45;
-const MARGIN = 30;
+const MAX_ANGLE = 60;
+const MARGIN = 60;
 
 const prefersReducedMotion = window.matchMedia(
   '(prefers-reduced-motion: reduce)'
@@ -33,7 +33,7 @@ function makeFlake() {
     y: rand(-MARGIN, height + MARGIN),
     depth,
     size: 2 + depth * 9,
-    speed: 13 + depth * 55,
+    speed: 17 + depth * 55,
     opacity: 0.25 + depth * 0.5,
     swayOffset: rand(0, Math.PI * 2),
     swaySpeed: rand(0.4, 1.2),
