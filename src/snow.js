@@ -132,7 +132,7 @@ if (!prefersReducedMotion) {
 
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
       document.addEventListener(
-        'click',
+        'pointerup',
         () => {
           DeviceOrientationEvent.requestPermission().catch(() => {
           });

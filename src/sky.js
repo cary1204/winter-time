@@ -25,7 +25,6 @@ let windows = { planets: {}, moon: null };
 let windowsKey = '';
 let screen = { planets: [], moon: null };
 
-//get loction
 function guessLocationFromTimezone() {
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
   const southern = /^(Australia|Antarctica)\/|Auckland|Sao_Paulo|Argentina|Santiago|Johannesburg|Lima|Montevideo/.test(zone);
@@ -44,7 +43,6 @@ function requestLocation() {
       updateSky();
     },
     () => {
-      //defualt
     },
     { timeout: 10000, maximumAge: 60 * 60 * 1000 }
   );
@@ -56,7 +54,6 @@ function bodyPosition(body, time, observer) {
   return { alt: hor.altitude, az: hor.azimuth };
 }
 
-//10min intvl
 const STEP_MIN = 10;
 const STEPS = (24 * 60) / STEP_MIN;
 
@@ -149,7 +146,6 @@ function toScreen({ alt, az }) {
   return { x, y };
 }
 
-// avoid
 function textBox() {
   const els = [...document.querySelectorAll('.content > *')];
   if (!els.length) return null;
@@ -167,34 +163,9 @@ function textBox() {
   );
 }
 
+const MIN_GAP = 64;
+
 function project() {
-  const box = textBox();
-  const labelBoxes = [];
-
-  screen.planets = sky.planets.map((p) => {
-    const pos = toScreen(p.shown);
-
-    // adjust no blocking
-    if (box && pos.x > box.left - 20 && pos.x < box.right + 20 &&
-        pos.y > box.top - 30 && pos.y < box.bottom + 16) {
-      const above = box.top - 30;
-      const below = box.bottom + 24;
-      pos.y = pos.y - above < below - pos.y && above > height * TOP ? above : below;
-    }
-
-    // labeling
-    ctx.font = '12px Georgia, serif';
-    const w = ctx.measureText(p.name).width;
-    const labelAt = (y) => ({ left: pos.x - w / 2 - 4, right: pos.x + w / 2 + 4, top: y - 12, bottom: y + 3 });
-    const overlaps = (a) => labelBoxes.some((b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
-    let labelY = pos.y - p.size - 8;
-    if (overlaps(labelAt(labelY))) labelY = pos.y + p.size + 16;
-    labelBoxes.push(labelAt(labelY));
-
-    return { ...p, pos, labelY };
-  });
-
-  // moon
   const R = moonRadius();
   const small = width <= 640;
   screen.moon = sky.moon && {
@@ -202,6 +173,76 @@ function project() {
     x: width * (1 - (small ? 0.1 : 0.14)) - R,
     y: height * (small ? 0.08 : 0.12) + R,
   };
+
+  const box = textBox();
+  const top = height * TOP + 20;
+  const bottom = height * HORIZON - 10;
+
+  function keepClear(pos) {
+    pos.x = Math.min(width - EDGE, Math.max(EDGE, pos.x));
+    pos.y = Math.min(bottom, Math.max(top, pos.y));
+    if (box && pos.x > box.left - 20 && pos.x < box.right + 20 &&
+        pos.y > box.top - 30 && pos.y < box.bottom + 16) {
+      const above = box.top - 30;
+      const below = box.bottom + 24;
+      pos.y = pos.y - above < below - pos.y && above > top ? above : below;
+    }
+  }
+
+  const planets = sky.planets.map((p) => ({ ...p, pos: toScreen(p.shown) }));
+  planets.forEach((p) => keepClear(p.pos));
+
+  for (let round = 0; round < 80; round++) {
+    let moved = false;
+
+    for (let i = 0; i < planets.length; i++) {
+      for (let j = i + 1; j < planets.length; j++) {
+        const a = planets[i].pos;
+        const b = planets[j].pos;
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let d = Math.hypot(dx, dy);
+        if (d >= MIN_GAP) continue;
+        if (d < 0.01) [dx, dy, d] = [1, 0, 1];
+        const push = (MIN_GAP - d) / 2 + 0.5;
+        a.x -= (dx / d) * push;
+        a.y -= (dy / d) * push;
+        b.x += (dx / d) * push;
+        b.y += (dy / d) * push;
+        moved = true;
+      }
+    }
+
+    const m = screen.moon;
+    if (m) {
+      const clearance = R + 40;
+      for (const p of planets) {
+        const dx = p.pos.x - m.x;
+        const dy = p.pos.y - m.y;
+        const d = Math.hypot(dx, dy) || 1;
+        if (d < clearance) {
+          p.pos.x = m.x + (dx / d) * clearance;
+          p.pos.y = m.y + (dy / d) * clearance;
+          moved = true;
+        }
+      }
+    }
+
+    planets.forEach((p) => keepClear(p.pos));
+    if (!moved) break;
+  }
+
+  ctx.font = '12px Georgia, serif';
+  const labelBoxes = [];
+  screen.planets = planets.map((p) => {
+    const w = ctx.measureText(p.name).width;
+    const labelAt = (y) => ({ left: p.pos.x - w / 2 - 4, right: p.pos.x + w / 2 + 4, top: y - 12, bottom: y + 3 });
+    const overlaps = (a) => labelBoxes.some((b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top);
+    let labelY = p.pos.y - p.size - 8;
+    if (overlaps(labelAt(labelY))) labelY = p.pos.y + p.size + 16;
+    labelBoxes.push(labelAt(labelY));
+    return { ...p, labelY };
+  });
 }
 
 function updateInfo() {
@@ -211,7 +252,7 @@ function updateInfo() {
   info.textContent = parts.join(' · ');
 }
 
-// draw
+// canvas
 function resize() {
   const dpr = window.devicePixelRatio || 1;
   width = window.innerWidth;
@@ -227,7 +268,6 @@ const moonRadius = () => Math.min(60, Math.max(35, width * 0.045));
 function drawMoon(m) {
   const R = moonRadius();
 
-  // glow
   const glow = ctx.createRadialGradient(m.x, m.y, R * 0.8, m.x, m.y, R * 3.5);
   glow.addColorStop(0, `rgba(246, 239, 217, ${0.08 + m.lit * 0.25})`);
   glow.addColorStop(1, 'rgba(246, 239, 217, 0)');
@@ -239,20 +279,18 @@ function drawMoon(m) {
   ctx.save();
   ctx.translate(m.x, m.y);
 
-  // Dark
   ctx.fillStyle = 'rgba(40, 48, 85, 0.85)';
   ctx.beginPath();
   ctx.arc(0, 0, R, 0, Math.PI * 2);
   ctx.fill();
 
-  //bright
   const litOnRight = m.waxing === location.lat >= 0;
   if (!litOnRight) ctx.scale(-1, 1);
 
-  const terminator = R * (1 - 2 * m.lit); // where light meets shadow
+  const terminator = R * (1 - 2 * m.lit);
   ctx.fillStyle = '#f6efd9';
   ctx.beginPath();
-  ctx.arc(0, 0, R, -Math.PI / 2, Math.PI / 2); // lit half
+  ctx.arc(0, 0, R, -Math.PI / 2, Math.PI / 2);
   if (terminator < 0) {
     ctx.ellipse(0, 0, -terminator, R, 0, Math.PI / 2, (3 * Math.PI) / 2); // gibbous
   } else {
@@ -287,20 +325,26 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-//tooltip sec.
-function findObjectAt(x, y) {
+function findObjectAt(x, y, isTouch) {
   const near = (p, r) => p && Math.hypot(p.x - x, p.y - y) <= r;
+  const reach = isTouch ? 30 : 16;
 
+  // readjust
+  let closest = null;
   for (const p of screen.planets) {
-    if (near(p.pos, 16)) {
-      return {
-        title: p.name,
-        detail: p.window.now
-          ? 'Planet, in the sky now'
-          : `Planet, highest around ${formatTime(p.window.peakDate)}`,
-        when: describeWindow(p.window),
-      };
-    }
+    const d = Math.hypot(p.pos.x - x, p.pos.y - y);
+    if (d <= reach && (!closest || d < closest.d)) closest = { d, p };
+  }
+
+  if (closest) {
+    const p = closest.p;
+    return {
+      title: p.name,
+      detail: p.window.now
+        ? 'Planet, in the sky now'
+        : `Planet, highest around ${formatTime(p.window.peakDate)}`,
+      when: describeWindow(p.window),
+    };
   }
 
   const m = screen.moon;
@@ -314,8 +358,8 @@ function findObjectAt(x, y) {
   return null;
 }
 
-function showTooltip(x, y) {
-  const obj = findObjectAt(x, y);
+function showTooltip(x, y, isTouch = false) {
+  const obj = findObjectAt(x, y, isTouch);
   if (!obj) {
     hideTooltip();
     return;
@@ -330,7 +374,7 @@ function showTooltip(x, y) {
   tooltip.append(title, detail, when);
   tooltip.hidden = false;
 
-  // Keep the tooltip on screen
+  // tooltip
   const box = tooltip.getBoundingClientRect();
   const left = Math.min(x + 14, width - box.width - 8);
   const top = y - box.height - 14 < 8 ? y + 18 : y - box.height - 14;
@@ -344,16 +388,17 @@ function hideTooltip() {
   document.body.style.cursor = '';
 }
 
-// taps/hovers
+// fixed clickers
 window.addEventListener('pointermove', (e) => {
   if (e.pointerType !== 'mouse') return;
   if (e.target.closest('.player')) hideTooltip();
   else showTooltip(e.clientX, e.clientY);
 });
 
-window.addEventListener('click', (e) => {
+// new pointer up
+window.addEventListener('pointerup', (e) => {
   if (e.target.closest('.player, button, input, a')) return;
-  showTooltip(e.clientX, e.clientY);
+  showTooltip(e.clientX, e.clientY, e.pointerType !== 'mouse');
 });
 
 document.addEventListener('mouseleave', hideTooltip);
@@ -362,6 +407,6 @@ document.addEventListener('mouseleave', hideTooltip);
 resize();
 window.addEventListener('resize', resize);
 updateSky();
-setInterval(updateSky, 60 * 1000);
+setInterval(updateSky, 60 * 1000); // planets and moon move slowly, once a minute is plenty
 requestLocation();
 requestAnimationFrame(draw);
