@@ -1,6 +1,6 @@
 {
   "name": "winter-night",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": false,
   "type": "module",
   "license": "MIT",
@@ -11,5 +11,8 @@
   },
   "devDependencies": {
     "vite": "^8.3.8"
+  },
+  "dependencies": {
+    "astronomy-engine": "^2.1.19"
   }
 }

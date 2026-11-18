@@ -43,22 +43,54 @@ body {
   border-radius: 50%;
   background: #fff;
   opacity: 0;
-  animation:twinkle ease-in-out infinite;
+  animation: twinkle ease-in-out infinite;
 }
 
-.moon {
+#sky {
   position: fixed;
-  top: 12%;
-  right: 14%;
-  z-index: 0;
-  width: clamp(70px, 9vw, 120px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #f6eed9;
-  box-shadow:
-    0 0 30px 12px rgba(246, 239, 217, 0.35),
-    0 0 120px 40px rgba(246, 239, 217, 0.15);
-  animation: moon-fade 3s ease-out 0.5s both;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* the mountains come later in the page, so they cover the horizon */
+  animation: page-fade 3s ease-out 0.3s both;
+}
+
+#sky.is-dragging {
+  cursor: grabbing;
+}
+
+/* Name + viewing time shown when you hover or tap something in the sky */
+.sky-tooltip {
+  position: fixed;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-width: 240px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: rgba(11, 16, 38, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.sky-tooltip[hidden] {
+  display: none;
+}
+
+.sky-tooltip strong {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.sky-tooltip span:nth-child(2) {
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .mountains {
@@ -120,6 +152,17 @@ body {
   animation: rise 1.6s ease-out 1.2s both;
 }
 
+/* Small line under the motto: direction and tonight's planets */
+.sky-info {
+  margin: 0.9rem 0 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  opacity: 0.55;
+  text-shadow: 0 1px 6px rgba(11, 16, 38, 0.95); /* readable when the moon is behind it */
+  animation: rise 1.6s ease-out 1.6s both;
+}
+
 #snow {
   position: fixed;
   inset: 0;
@@ -127,6 +170,16 @@ body {
   height: 100%;
   z-index: 1;
   pointer-events: none;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: var(--max-opacity);
+  }
 }
 
 @keyframes page-fade {
@@ -160,42 +213,17 @@ body {
   }
 }
 
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.1;
-  }
-  50% {
-    opacity: var(--max-opacity);
-  }
-}
-
-@keyframes moon-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media (max-width: 640px) {
-  .moon {
-    right: 10%;
-    top: 8%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   body,
-  .moon,
+  #sky,
   .mountains,
   .clock,
-  .motto {
-    animation: none;
-  }
+  .motto,
   .star {
     animation: none;
-    opacity:var(--max-opacity);
+    opacity: var(--max-opacity);
+  }
+  .sky-info {
+    animation: none;
   }
 }

@@ -8,19 +8,24 @@ Will try to remake this with React some times later.
 
 **demo → https://cary1204.github.io/winter-time/**
 
-<img src="screenshot.png" alt="Winter Night screenshot" width="450">
+<img src="screenshot.png" alt="Winter Night screenshot" width="750">
 
 
 # Features
 
+ - Unoptimized Code that might lag your browser
  - Time
  - Falling snow
+ - Moon phases
+ - Planets visible from naked eye
  - Mobile tilt sense (click the screen and press `allow` for the tilt sensor)
 
 
 # Some stuff used
 
 Build tool: [Vite](https://vite.dev)
+
+Astronomy Engine: [Astronomy Engine](https://www.npmjs.com/package/astronomy-engine)
 
 npm: [npm](https://www.npmjs.com/)
 
