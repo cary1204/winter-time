@@ -21,13 +21,15 @@ Will try to remake this with React some times later.
  - Mobile tilt sense (click the screen and press `allow` for the tilt sensor)
 
 
-# Some stuff used
+# Some stuff used / Credits
 
 Build tool: [Vite](https://vite.dev)
 
 Astronomy Engine: [Astronomy Engine](https://www.npmjs.com/package/astronomy-engine)
 
 npm: [npm](https://www.npmjs.com/)
+
+music: [pixabay no copyright music](https://pixabay.com/)
 
 ## Requirements
 
@@ -52,8 +54,11 @@ Opens the url displayed on the bottom
 
 ## Configs
 
-| Settings                      | Locations                                               |
-| ----------------------------- | --------------------------------------------------------|
-| Mountains, text               | `index.html`                                            |
-| Colors, fonts, fade timing    | `src/style.css` (the const on top should be fine)       |
-| Clock , snow                  | `src/main.js`                                           |
+| Settings                                  | Locations                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------- |
+| Mountains, text, player layout            | `index.html`                                                        |
+| Colors, fonts, fade timing, record size   | `src/style.css`                                                     |
+| Clock, stars                              | `src/main.js` (`STAR_COUNT`)                                        |
+| Snow amount, speed, tilt                  | `src/snow.js` (`FLAKE_COUNT`, `MAX_ANGLE`)                          |
+| Moon, planets, spacing                    | `src/sky.js` (`HORIZON`, `MIN_GAP`)                                 |
+| Songs                                     | `src/player.js` (`TRACKS` on top), MP3 files go in `public/music/`  |
