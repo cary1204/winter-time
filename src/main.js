@@ -1,5 +1,6 @@
 import './snow.js'
 import './sky.js'
+import './player.js';
 const clock = document.getElementById('clock');
 
 function updateClock() {
